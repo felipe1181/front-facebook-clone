@@ -1,0 +1,46 @@
+# Workflow básico frontend react
+
+name: CI-Frontend-react
+
+# Controla quando a ação será executada.
+on:
+  # Aciona o fluxo de trabalho em eventos de solicitação push ou pull, mas apenas para o branch principal
+  push:
+    branches: [master, development]
+  pull_request:
+    branches: [master, development]
+
+  # Permite que você execute este fluxo de trabalho manualmente na guia Ações
+  workflow_dispatch:
+
+# A execução de um fluxo de trabalho é composta por uma ou mais tarefas que podem ser executadas sequencialmente ou em paralelo
+jobs:
+  # Este fluxo de trabalho contém um único trabalho denominado "build"
+  build:
+    # O tipo de sistema operacional que vai executar a job
+    runs-on: ubuntu-latest
+
+    # As etapas representam uma sequência de tarefas que serão executadas como parte do trabalho
+    steps:
+      # Faz o check-out de seu repositório em $ GITHUB_WORKSPACE, para que jop acessar
+      - name: Checkout do repositório
+      - uses: actions/checkout@v2
+
+      - name: Configurar versão do node para v14
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+        # Instala dependências do projeto usando o clean install
+      - name: Instalar dependências
+        run: npm ci
+
+        # Executa teste do projeto e cria o coverage
+      - name: Executar testes
+        run: npm test -- --coverage
+        env:
+          CI: true
+
+        # Cria um build do projeto para produção
+      - name: Gerar build
+        run: npm run build
